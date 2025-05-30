@@ -1,4 +1,4 @@
-FROM clojure:temurin-21-tools-deps-jammy
+FROM  clojure:temurin-21-tools-deps-trixie
 
 ## libgomp1 is needed for datalevin else you'll get an UnsatisfiedLinkError
 RUN apt-get update && apt-get install -y --no-install-recommends apt-utils apt-transport-https ca-certificates gnupg curl sudo libgomp1 -o APT::Immediate-Configure=0
