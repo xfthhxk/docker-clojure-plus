@@ -1,0 +1,35 @@
+{:tasks
+ {:requires
+  ([clojure.string :as str])
+
+  :init
+  (do
+    (def docker-image "xfthhxk/clojure-plus")
+
+    (defn git-rev-count
+      []
+      (->> "git rev-list --count HEAD"
+           (shell {:out :string})
+           :out
+           str/trim))
+
+    (defn image-with-tag
+      []
+      (str docker-image ":0.1." (git-rev-count)))
+
+    (defn image-tags
+      []
+      {:versioned (image-with-tag)
+       :latest (str docker-image ":latest")}))
+
+  docker:build
+  {:doc "Build docker image"
+   :task (let [{:keys [versioned latest]} (image-tags)]
+           (shell (format "docker buildx build -t %s -t %s ." versioned latest)))}
+
+  docker:push
+  {:doc "Push the image to docker hub"
+   :depends [docker:build]
+   :task (let [{:keys [versioned latest]} (image-tags)]
+           (shell (str "docker push " versioned))
+           (shell (str "docker push " latest)))}}}
